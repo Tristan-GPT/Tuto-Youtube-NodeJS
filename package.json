@@ -1,0 +1,25 @@
+{
+  "name": "tuto-youtube-nodejs",
+  "version": "0.0.0",
+  "description": "Tuto YouTube",
+  "keywords": [
+    "nodejs",
+    "api",
+    "express"
+  ],
+  "homepage": "https://github.com/Tristan-GPT/Tuto-Youtube-NodeJS#readme",
+  "bugs": {
+    "url": "https://github.com/Tristan-GPT/Tuto-Youtube-NodeJS/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tristan-GPT/Tuto-Youtube-NodeJS.git"
+  },
+  "license": "Apache-2.0",
+  "author": "Tristan-GPT",
+  "type": "module",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  }
+}
