@@ -4,6 +4,9 @@ import { fileURLToPath } from 'node:url';
 import express from 'express';
 import cors from 'cors';
 import Cat from './routes/Cat.js';
+import Test from './routes/Test.js';
+import cookieParser from 'cookie-parser';
+import bodyParser from 'body-parser';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -13,9 +16,12 @@ config({ path: resolve(__dirname, '../.env') });
 const app = express();
 
 app.use(express.json());
+app.use(bodyParser.json());
+app.use(cookieParser())
 app.use(cors());
 
 app.use('/cat', Cat)
+app.use('/test', Test)
 
 const PORT = process.env.PORT || 5000;
 
