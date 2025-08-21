@@ -6,6 +6,7 @@ import cors from 'cors';
 import Cat from './routes/Cat.js';
 import Test from './routes/Test.js';
 import Account from './routes/Account.js';
+import Auth from './routes/Auth.js';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import { createConnection } from 'mysql2';
@@ -38,6 +39,7 @@ app.use(cors());
 app.use('/cat', Cat)
 app.use('/test', Test)
 app.use('/account', Account)
+app.use('/auth', Auth)
 
 const PORT = process.env.PORT || 5000;
 
