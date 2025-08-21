@@ -27,5 +27,9 @@
     "@types/node": "^24.3.0",
     "dotenv": "^17.2.1",
     "eslint": "^9.33.0"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^5.1.0"
   }
 }

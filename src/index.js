@@ -1,99 +1,32 @@
-const API_URL = `https://api.thecatapi.com/v1/`;
-const API_KEY = "live_LGwL4AM3cuPxX8J1oiHnZlhIfNwbNLl8QQR4RAeV1CvC0VKPTP1b6vQzSW9rTaRi";
+import { config } from 'dotenv';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+import express from 'express';
+import cors from 'cors';
+import Cat from './routes/Cat.js';
 
-let currentImageToVoteOn;
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
-function showHistoricVotes()
-{
-  
-  document.getElementById('vote-options').style.display = 'none';
-  document.getElementById('vote-results').style.display = 'block';
+config({ path: resolve(__dirname, '../.env') });
 
-  const url = `${API_URL}votes?limit=10&order=DESC`;
+const app = express();
 
-  fetch(url,{headers: {
-    'x-api-key': API_KEY
-  }})
-  .then((response) => {
-    return response.json();
-  })
-  .then((data) => {
-  
-    data.map(function(voteData) {
- 
-    const imageData = voteData.image
- 
-    let image = document.createElement('img');
-     //use the url from the image object
-     image.src = imageData.url
-            
-    let gridCell = document.createElement('div');
-    
-      if(voteData.value<0)
-      {
-        gridCell.classList.add('red') 
-      } else {
-        gridCell.classList.add('green')
-      }
-      
-    gridCell.classList.add('col-lg');
+app.use(express.json());
+app.use(cors());
 
-    gridCell.appendChild(image)
-       
-    document.getElementById('grid').appendChild(gridCell);
-       
-    });
-  
-  })
-  .catch(function(error) {
-     console.log(error);
-  });
-  
-}
+app.use('/cat', Cat)
 
-function showVoteOptions()
-{
-  document.getElementById("grid").innerHTML = '';
-  
-  document.getElementById('vote-options').style.display = 'block';
-  document.getElementById('vote-results').style.display = 'none';
-  
-  showImageToVoteOn()
-}
+const PORT = process.env.PORT || 5000;
 
-function showImageToVoteOn()
-{
-  
-  const url = `${API_URL}images/search`;
+app.get('/', (_req, res) => {
 
-  fetch(url,{headers: {
-    'x-api-key': API_KEY
-  }, credentials: true})
-  .then((response) => {
-    return response.json();
-  })
-  .then((data) => {
-    currentImageToVoteOn = data[0];
-    document.getElementById("image-to-vote-on").src= currentImageToVoteOn.url;
-  });
+    res.status(200).json({ message: "success", success: true })
 
-}
+})
 
-function vote(value)
-{
-  
-  const url = `${API_URL}votes/`;
-  const body = {
-    image_id:currentImageToVoteOn.id,
-    value
-  }
-  fetch(url,{method:"POST",body:JSON.stringify(body),headers: {
-    'content-type':"application/json",
-    'x-api-key': API_KEY
-  }})
-  .then((response) => {
-    showVoteOptions()
-  })
-}
+app.listen(PORT, () => {
 
-showVoteOptions()
+    console.log(`API listen on port ${PORT}`)
+
+});
