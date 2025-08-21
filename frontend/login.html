@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+     <link rel="stylesheet" href="./styles.css">
+     <link rel="stylesheet" href="./login.css">
+     <link rel="icon" href="./image.png">
+     <script src="./login.js"></script>
+     <script src="./navbar.js" defer></script>
+    <title>Cat Website</title>
+</head>
+<body>
+
+    <div class="navbar">
+        <nav>
+            <ul>
+                <li><a href="/frontend/index.html">Accueil</a></li>
+                <li><a href="/frontend/forum.html">Forum</a></li>
+                <li><a href="/frontend/login.html" class="login">Se connecter</a></li>
+            </ul>
+        </nav>
+    </div>
+
+    <div class="form-login-container">
+
+        <h1>Se connecter</h1>
+        <input type="email" class="mail" placeholder="E-mail">
+        <input type="password" class="password" placeholder="Mot de passe">
+        <button onclick="getLogin()">Se connecter</button>
+
+    </div>
+    <div class="form-signup-container">
+
+        <h1>S'inscrire</h1>
+        <input type="email" class="mail" placeholder="E-mail">
+        <input type="text" class="username" placeholder="Nom d'utilisateur" maxlength="20" minlength="3">
+        <input type="password" class="password" placeholder="Mot de passe">
+        <button onclick="getSignup()">S'inscrire</button>
+
+    </div>
+</body>
+</html>

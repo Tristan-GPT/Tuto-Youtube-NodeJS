@@ -1,8 +1,33 @@
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
 import { db } from '../index.js';
+import jwt from 'jsonwebtoken';
+import ms from 'ms';
+import { config } from 'dotenv';
+import { fileURLToPath } from 'node:url';
+import { dirname, resolve } from 'node:path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+config({ path: resolve(__dirname, '../../.env') });
 
 const router = Router();
+
+const JWT_SECRET = process.env.JWT_SECRET;
+
+const JWT_EXPIRES = '7d';
+
+function sendToken(res, payload) {
+	const token = jwt.sign(payload, JWT_SECRET);
+	res.cookie('token', token, {
+		httpOnly: true,
+		secure: process.env.PROD === 'true',
+		sameSite: 'strict',
+		maxAge: ms(JWT_EXPIRES),
+	});
+	return token;
+}
 
 router.post('/signup', async (req, res) => {
 
@@ -26,7 +51,9 @@ router.post('/signup', async (req, res) => {
 		try {
 
 			db.promise().query('INSERT INTO users (mail,password,username) VALUES (?,?,?)', [mail, hashPassword, username]);
-			return res.status(200).json({ message: 'success.' });
+
+			const token = sendToken(res, { mail, username });
+			return res.status(200).json({ message: 'success.', token });
 
 		}
 		catch (err) {
@@ -51,7 +78,8 @@ router.post('/login', async (req, res) => {
 		const same = await bcrypt.compare(password, hashedPassword);
 
 		if (same) {
-			return res.status(200).json({ message: 'success.' });
+			const token = sendToken(res, { mail: result[0][0].mail, username: result[0][0].username });
+			return res.status(200).json({ message: 'success.', token });
 		}
 		else {
 			return res.status(401).json({ message: 'Invalid password.' });
@@ -59,6 +87,19 @@ router.post('/login', async (req, res) => {
 
 	}
 
+});
+
+router.get('/verify', async (req, res) => {
+	const token = req.cookies.token || req.headers['authorization'].split(' ')[1];
+	if (!token) return res.status(200).json({ valid: false });
+
+	try {
+		const decoded = jwt.verify(token, JWT_SECRET);
+		res.status(200).json({ valid: true, username: decoded.username, mail: decoded.mail });
+	}
+	catch {
+		res.status(200).json({ valid: false });
+	}
 });
 
 export default router;
