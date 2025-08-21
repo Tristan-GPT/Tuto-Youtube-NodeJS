@@ -1,39 +1,99 @@
-/**Callback */
+const API_URL = `https://api.thecatapi.com/v1/`;
+const API_KEY = "live_LGwL4AM3cuPxX8J1oiHnZlhIfNwbNLl8QQR4RAeV1CvC0VKPTP1b6vQzSW9rTaRi";
 
-import { readFile } from 'node:fs';
+let currentImageToVoteOn;
 
-readFile('./data.txt', "utf-8", (err, data) => {
-    if(err) {
-        console.error("Erreur: ", err)
-        return;
-    }
-    console.log("Contenu du fichier: ", data)
-})
+function showHistoricVotes()
+{
+  
+  document.getElementById('vote-options').style.display = 'none';
+  document.getElementById('vote-results').style.display = 'block';
 
-/**Promises */
+  const url = `${API_URL}votes?limit=10&order=DESC`;
 
-const wait = (ms) => new Promise((resolve) => {
-    setTimeout(() => resolve(`Attendu ${ms}ms`), ms)
-});
+  fetch(url,{headers: {
+    'x-api-key': API_KEY
+  }})
+  .then((response) => {
+    return response.json();
+  })
+  .then((data) => {
+  
+    data.map(function(voteData) {
+ 
+    const imageData = voteData.image
+ 
+    let image = document.createElement('img');
+     //use the url from the image object
+     image.src = imageData.url
+            
+    let gridCell = document.createElement('div');
+    
+      if(voteData.value<0)
+      {
+        gridCell.classList.add('red') 
+      } else {
+        gridCell.classList.add('green')
+      }
+      
+    gridCell.classList.add('col-lg');
 
+    gridCell.appendChild(image)
+       
+    document.getElementById('grid').appendChild(gridCell);
+       
+    });
+  
+  })
+  .catch(function(error) {
+     console.log(error);
+  });
+  
+}
 
-/**Async Await */
+function showVoteOptions()
+{
+  document.getElementById("grid").innerHTML = '';
+  
+  document.getElementById('vote-options').style.display = 'block';
+  document.getElementById('vote-results').style.display = 'none';
+  
+  showImageToVoteOn()
+}
 
-const run = async () => {
-    console.log("Début")
-    const result = await wait(1000)
-    console.log(result)
-    console.log("Fin")
+function showImageToVoteOn()
+{
+  
+  const url = `${API_URL}images/search`;
+
+  fetch(url,{headers: {
+    'x-api-key': API_KEY
+  }, credentials: true})
+  .then((response) => {
+    return response.json();
+  })
+  .then((data) => {
+    currentImageToVoteOn = data[0];
+    document.getElementById("image-to-vote-on").src= currentImageToVoteOn.url;
+  });
 
 }
 
-run()
+function vote(value)
+{
+  
+  const url = `${API_URL}votes/`;
+  const body = {
+    image_id:currentImageToVoteOn.id,
+    value
+  }
+  fetch(url,{method:"POST",body:JSON.stringify(body),headers: {
+    'content-type':"application/json",
+    'x-api-key': API_KEY
+  }})
+  .then((response) => {
+    showVoteOptions()
+  })
+}
 
-
-/**
- * Task 1: 5min
- * Task 2: 2min
- * Task 3: dépend de Task 2 et dure 3min
- * 
- * Task 1 se fait en même temps que Task 2 et Task 3 attend que Task 2 soit fini pour s'exécuter
- */
+showVoteOptions()
