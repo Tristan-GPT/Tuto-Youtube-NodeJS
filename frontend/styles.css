@@ -70,3 +70,18 @@ h1 {
 p {
     font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 }
+
+button.account-remove {
+    background-color: rgb(202, 11, 11);
+    border: none;
+    padding: 20px;
+    border-radius: 10px;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    font-size: 18px;
+    color: white;
+}
+
+button.account-remove:hover {
+    background-color: rgb(204, 47, 47);
+    transition-duration: 0.3s;
+}

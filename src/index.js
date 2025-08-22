@@ -17,47 +17,47 @@ const __dirname = dirname(__filename);
 config({ path: resolve(__dirname, '../.env') });
 
 const db = createConnection({
-    host: 'localhost',
-    user: 'root',
-    password: '',
-    database: 'expresstuto'
+	host: 'localhost',
+	user: 'root',
+	password: '',
+	database: 'expresstuto',
 });
 
-db.connect(function (err) {
-    if(err) throw err;
+db.connect(function(err) {
+	if (err) throw err;
 
-    console.log(`Database connected.`)
-})
+	console.log('Database connected.');
+});
 
 const app = express();
 
 app.use(express.json());
 app.use(bodyParser.json());
-app.use(cookieParser())
+app.use(cookieParser());
 app.use(cors({
-    origin: 'http://localhost:5500',
-    credentials: true
+	origin: 'http://localhost:5500',
+	credentials: true,
 }));
 
-app.use('/cat', Cat)
-app.use('/test', Test)
-app.use('/account', Account)
-app.use('/auth', Auth)
+app.use('/cat', Cat);
+app.use('/test', Test);
+app.use('/account', Account);
+app.use('/auth', Auth);
 
 const PORT = process.env.PORT || 5000;
 
 app.get('/', (_req, res) => {
 
-    res.status(200).json({ message: "success", success: true })
+	res.status(200).json({ message: 'success', success: true });
 
-})
+});
 
 app.listen(PORT, () => {
 
-    console.log(`API listen on port ${PORT}`)
+	console.log(`API listen on port ${PORT}`);
 
 });
 
 export {
-    db
-}
+	db,
+};

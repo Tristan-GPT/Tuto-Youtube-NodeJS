@@ -89,8 +89,48 @@ router.post('/login', async (req, res) => {
 
 });
 
+router.post('/logout', async (req, res) => {
+
+	res.clearCookie('token', {
+		httpOnly: true,
+		secure: process.env.PROD === 'true',
+		sameSite: 'strict',
+	});
+	res.status(200).json({ message: 'success' });
+
+});
+
+router.delete('/delete', async (req, res) => {
+
+	if (!req.cookies.token) return res.status(401).json({ error: 'Not connected' });
+
+	const isValid = await fetch('http://localhost:5000/auth/verify', {
+		headers: {
+			'Authorization': `Bearer ${req.cookies.token}`,
+		},
+		method: 'GET',
+	});
+
+	const result = await isValid.json();
+
+	if (result.valid) {
+		db.query('DELETE FROM users WHERE mail = ?', [result.mail]);
+		res.clearCookie('token', {
+			httpOnly: true,
+			secure: process.env.PROD === 'true',
+			sameSite: 'strict',
+		});
+		res.status(200).json({ message: 'success.' });
+
+	}
+	else {
+		return res.status(401).json({ error: 'Not connected' });
+	}
+
+});
+
 router.get('/verify', async (req, res) => {
-	const token = req.cookies.token || req.headers['authorization'].split(' ')[1];
+	const token = req.cookies.token || req.headers['authorization']?.split(' ')[1];
 	if (!token) return res.status(200).json({ valid: false });
 
 	try {
