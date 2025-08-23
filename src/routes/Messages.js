@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { prisma } from '../index.js';
 import { isConnected } from '../middlewares/isConnected.js';
+import { validate } from '../middlewares/validate.js';
+import { messageSchema } from '../utils/schema.js';
 
 const router = Router();
 
@@ -12,7 +14,7 @@ router.get('/list', isConnected, async (_req, res) => {
 			orderBy: { id: 'desc' },
 			take: 10,
 		});
-		res.status(200).json({ list: list });
+		res.status(200).json({ list: list.reverse() });
 
 
 	}
@@ -23,7 +25,7 @@ router.get('/list', isConnected, async (_req, res) => {
 
 });
 
-router.post('/post', isConnected, async (req, res) => {
+router.post('/post', [isConnected, validate(messageSchema)], async (req, res) => {
 	const { message } = req.body;
 
 	if (!message) return res.status(401).json({ error: 'Missing fields.' });

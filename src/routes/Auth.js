@@ -7,6 +7,8 @@ import { config } from 'dotenv';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
 import { isConnected } from '../middlewares/isConnected.js';
+import { validate } from '../middlewares/validate.js';
+import { loginSchema, registerSchema } from '../utils/schema.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -30,19 +32,11 @@ function sendToken(res, payload) {
 	return token;
 }
 
-router.post('/signup', async (req, res) => {
+router.post('/signup', validate(registerSchema), async (req, res) => {
 
 	const mail = req.body.mail;
 	const password = req.body.password;
 	const username = req.body.username;
-	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-	const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
-
-
-	if (!mail || !password || !username) return res.status(400).json({ error: 'Missing fields' });
-
-	if (!emailRegex.test(mail)) return res.status(400).json({ error: 'Invalid mail.' });
-	if (!usernameRegex.test(username)) return res.status(400).json({ error: 'Invalid username' });
 
 	const hashPassword = await bcrypt.hash(password, 12);
 
@@ -82,13 +76,9 @@ router.post('/signup', async (req, res) => {
 
 });
 
-router.post('/login', async (req, res) => {
+router.post('/login', validate(loginSchema), async (req, res) => {
 
 	const { mail, password } = req.body;
-	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-	if (!emailRegex.test(mail)) return res.status(400).json({ error: 'Invalid mail.' });
-
-	if (!mail || !password) return res.status(400).json({ error: 'Missing fields' });
 
 	const user = await prisma.user.findUnique({
 		where: { mail },
