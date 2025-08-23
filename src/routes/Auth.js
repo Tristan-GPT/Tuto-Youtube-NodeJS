@@ -37,6 +37,7 @@ router.post('/signup', async (req, res) => {
 	const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 	const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/;
 
+
 	if (!mail || !password || !username) return res.status(400).json({ error: 'Missing fields' });
 
 	if (!emailRegex.test(mail)) return res.status(400).json({ error: 'Invalid mail.' });
@@ -131,7 +132,7 @@ router.delete('/delete', async (req, res) => {
 
 router.get('/verify', async (req, res) => {
 	const token = req.cookies.token || req.headers['authorization']?.split(' ')[1];
-	if (!token) return res.status(200).json({ valid: false });
+	if (!token) return res.status(200).json({ valid: false }) && console.log('Token missing');
 
 	try {
 		const decoded = jwt.verify(token, JWT_SECRET);

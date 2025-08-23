@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="./styles.css">
+    <link rel="icon" href="./image.png">
+    <script src="./navbar.js" defer></script>
+    <script src="./remove.js" defer></script>
+    <script src="./forum.js" defer></script>t
+    <title>Cat Website</title>
+</head>
+<body>
+     <div class="navbar">
+        <nav>
+        <ul>
+            <li><a href="/frontend/index.html">Accueil</a></li>
+            <li><a href="/frontend/forum.html">Forum</a></li>
+            <li><a href="/frontend/login.html" class="login">Se connecter</a></li>
+            <li><a onclick="getLogout()" class="logout">Se déconnecter</a></li>
+        </ul>
+    </nav>
+    </div>
+
+    <div class="messages-container">
+        
+    </div>
+    <input type="text" class="message-container"> <button onclick="postMessage()" class="post">Poster</button>
+
+</body>
+</html>

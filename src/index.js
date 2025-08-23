@@ -7,6 +7,7 @@ import Cat from './routes/Cat.js';
 import Test from './routes/Test.js';
 import Account from './routes/Account.js';
 import Auth from './routes/Auth.js';
+import Messages from './routes/Messages.js';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import { createConnection } from 'mysql2';
@@ -43,6 +44,7 @@ app.use('/cat', Cat);
 app.use('/test', Test);
 app.use('/account', Account);
 app.use('/auth', Auth);
+app.use('/messages', Messages);
 
 const PORT = process.env.PORT || 5000;
 
