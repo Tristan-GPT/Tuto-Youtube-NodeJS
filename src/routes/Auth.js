@@ -6,6 +6,7 @@ import ms from 'ms';
 import { config } from 'dotenv';
 import { fileURLToPath } from 'node:url';
 import { dirname, resolve } from 'node:path';
+import { isConnected } from '../middlewares/isConnected.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -101,32 +102,19 @@ router.post('/logout', async (req, res) => {
 
 });
 
-router.delete('/delete', async (req, res) => {
+router.delete('/delete', isConnected, async (req, res) => {
 
 	if (!req.cookies.token) return res.status(401).json({ error: 'Not connected' });
 
-	const isValid = await fetch('http://localhost:5000/auth/verify', {
-		headers: {
-			'Authorization': `Bearer ${req.cookies.token}`,
-		},
-		method: 'GET',
+
+	db.query('DELETE FROM users WHERE mail = ?', [result.mail]);
+	res.clearCookie('token', {
+		httpOnly: true,
+		secure: process.env.PROD === 'true',
+		sameSite: 'strict',
 	});
+	res.status(200).json({ message: 'success.' });
 
-	const result = await isValid.json();
-
-	if (result.valid) {
-		db.query('DELETE FROM users WHERE mail = ?', [result.mail]);
-		res.clearCookie('token', {
-			httpOnly: true,
-			secure: process.env.PROD === 'true',
-			sameSite: 'strict',
-		});
-		res.status(200).json({ message: 'success.' });
-
-	}
-	else {
-		return res.status(401).json({ error: 'Not connected' });
-	}
 
 });
 
