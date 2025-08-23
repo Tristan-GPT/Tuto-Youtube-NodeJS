@@ -16,7 +16,6 @@ router.get('/list', isConnected, async (_req, res) => {
 		});
 		res.status(200).json({ list: list.reverse() });
 
-
 	}
 	catch (err) {
 		console.error(err);
@@ -36,12 +35,13 @@ router.post('/post', [isConnected, validate(messageSchema)], async (req, res) =>
 			username: user,
 		},
 	});
+	console.log(userTest);
 	if (!userTest) return res.status(401).json({ error: 'Unknown user.' });
 
 	await prisma.message.create({
 		data: {
 			content: message,
-			username: user,
+			user: { connect: { id:userTest.id } },
 		},
 	});
 

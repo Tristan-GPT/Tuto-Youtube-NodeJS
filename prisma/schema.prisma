@@ -18,10 +18,15 @@ model User {
   username String @unique
   mail String @unique
   password String
+  messages Message[]
+
+  @@unique([id, username])
 }
 
 model Message {
   id Int @id @default(autoincrement())
   content String
+  userId Int
   username String
+  user User @relation(fields: [userId, username], references: [id, username], onDelete: Cascade)
 }

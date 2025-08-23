@@ -127,6 +127,9 @@ router.delete('/delete', isConnected, async (req, res) => {
 		secure: process.env.PROD === 'true',
 		sameSite: 'strict',
 	});
+	await prisma.user.delete({
+		where: { id: user.id },
+	});
 	res.status(200).json({ message: 'success.' });
 
 
