@@ -3,6 +3,7 @@ import { prisma } from '../index.js';
 import { isConnected } from '../middlewares/isConnected.js';
 import { validate } from '../middlewares/validate.js';
 import { messageSchema } from '../utils/schema.js';
+import { isAdmin } from '../middlewares/isAdmin.js';
 
 const router = Router();
 
@@ -47,6 +48,28 @@ router.post('/post', [isConnected, validate(messageSchema)], async (req, res) =>
 
 	res.status(200).json({ message: 'success' });
 
+
+});
+
+router.post('/delete', [isConnected, isAdmin], async (req, res) => {
+	console.log(req.body);
+	const { id } = req.body;
+
+	const message = await prisma.message.findUnique({
+		where: {
+			id,
+		},
+	});
+
+	if (!message) {return res.status(404).json({ error: 'No message' });}
+	else {
+		await prisma.message.delete({
+			where: {
+				id,
+			},
+		});
+		return res.status(200).json({ success: true });
+	}
 
 });
 

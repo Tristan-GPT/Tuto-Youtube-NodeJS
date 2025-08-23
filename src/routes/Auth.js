@@ -9,6 +9,7 @@ import { dirname, resolve } from 'node:path';
 import { isConnected } from '../middlewares/isConnected.js';
 import { validate } from '../middlewares/validate.js';
 import { loginSchema, registerSchema } from '../utils/schema.js';
+import { isAdmin } from '../middlewares/isAdmin.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -57,7 +58,7 @@ router.post('/signup', validate(registerSchema), async (req, res) => {
 
 		try {
 
-			await prisma.user.create({
+			const user = await prisma.user.create({
 				data: {
 					username,
 					password: hashPassword,
@@ -65,7 +66,7 @@ router.post('/signup', validate(registerSchema), async (req, res) => {
 				},
 			});
 
-			const token = sendToken(res, { mail, username });
+			const token = sendToken(res, { mail, username, id: user.id });
 			return res.status(200).json({ message: 'success.', token });
 
 		}
@@ -89,7 +90,7 @@ router.post('/login', validate(loginSchema), async (req, res) => {
 		const same = await bcrypt.compare(password, hashedPassword);
 
 		if (same) {
-			const token = sendToken(res, { mail: user.mail, username: user.username });
+			const token = sendToken(res, { mail: user.mail, username: user.username, id: user.id });
 			return res.status(200).json({ message: 'success.', token });
 		}
 		else {
@@ -141,11 +142,42 @@ router.get('/verify', async (req, res) => {
 
 	try {
 		const decoded = jwt.verify(token, JWT_SECRET);
-		res.status(200).json({ valid: true, username: decoded.username, mail: decoded.mail });
+		res.status(200).json({ valid: true, username: decoded.username, mail: decoded.mail, id: decoded.id });
 	}
 	catch {
 		res.status(200).json({ valid: false });
 	}
+});
+
+router.post('/admin', [isConnected, isAdmin], async (req, res) => {
+
+	const { userId, username } = req.body;
+	try {
+
+		const user = await prisma.user.findUnique({
+			where: { id: userId },
+		});
+		if (!user) return res.status(401).json({ error: 'No user' });
+
+		const admin = await prisma.admin.findUnique({
+			where: { userId: userId },
+		});
+		if (admin) return res.status(401).json({ error: 'Already admin' });
+
+		await prisma.admin.create({
+			data: {
+				userId,
+				username,
+			},
+		});
+
+		res.status(200).json({ success: true });
+
+	}
+	catch (err) {
+		console.error(err);
+	}
+
 });
 
 export default router;

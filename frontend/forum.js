@@ -11,8 +11,17 @@ async function getMessages() {
 	for (let i = 0; i < res.list.length; i++) {
 		const messageDiv = document.createElement('div');
 		messageDiv.classList.add('message');
-
-		messageDiv.textContent = `${res.list[i].username} - ${res.list[i].content}`;
+		messageDiv.classList.add(res.list[i].id);
+		const deleteButton = document.createElement('button');
+		deleteButton.classList.add(res.list[i].id);
+		deleteButton.textContent = 'Supprimer';
+		deleteButton.addEventListener('click', () => {
+			deleteMessage(res.list[i].id);
+		});
+		const messageText = document.createElement('span');
+		messageText.textContent = `${res.list[i].username} - ${res.list[i].content}`;
+		messageDiv.appendChild(deleteButton);
+		messageDiv.appendChild(messageText);
 
 		div.appendChild(messageDiv);
 	}
@@ -37,6 +46,18 @@ async function postMessage() {
 	if (posting.ok) {
 		getMessages();
 	}
+}
+
+async function deleteMessage(id) {
+	await fetch('http://localhost:5000/messages/delete', {
+		method: 'POST',
+		credentials: 'include',
+		headers: {
+			'Content-Type': 'application/json',
+		},
+		body: JSON.stringify({ id: id }),
+	});
+	getMessages();
 }
 
 getMessages();

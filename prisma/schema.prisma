@@ -21,6 +21,8 @@ model User {
   messages Message[]
 
   @@unique([id, username])
+
+  Admin Admin[]
 }
 
 model Message {
@@ -29,4 +31,11 @@ model Message {
   userId Int
   username String
   user User @relation(fields: [userId, username], references: [id, username], onDelete: Cascade)
+}
+
+model Admin {
+  id Int @id @default(autoincrement())
+  userId Int @unique
+  username String
+  user User @relation(fields: [userId], references: [id])
 }
