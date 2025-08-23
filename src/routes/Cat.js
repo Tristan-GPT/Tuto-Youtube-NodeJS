@@ -1,8 +1,9 @@
 import { Router } from 'express';
+import { catratelimit } from '../middlewares/catRatelimit.js';
 
 const router = Router();
 
-router.get('/catimage', (req, res) => {
+router.get('/catimage', catratelimit, (req, res) => {
 
 	fetch(`https://api.thecatapi.com/v1/images/search?api_key=${process.env.API_KEY}`, {
 		method: 'GET',

@@ -5,12 +5,14 @@ import express from 'express';
 import cors from 'cors';
 import Cat from './routes/Cat.js';
 import Test from './routes/Test.js';
-import Account from './routes/Account.js';
 import Auth from './routes/Auth.js';
 import Messages from './routes/Messages.js';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
 import { createConnection } from 'mysql2';
+import helmet from 'helmet';
+import { ratelimit } from './middlewares/ratelimit.js';
+import { ErrorHandler } from './middlewares/ErrorHandler.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
@@ -36,13 +38,15 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(cors({
-	origin: 'http://localhost:5500',
+	origin: ['http://localhost:5500'],
 	credentials: true,
+	methods: ['GET', 'POST', 'DELETE'],
 }));
-
+app.use(helmet());
+app.use(ratelimit());
+app.use((err, req, res, next) => ErrorHandler(err, req, res, next));
 app.use('/cat', Cat);
 app.use('/test', Test);
-app.use('/account', Account);
 app.use('/auth', Auth);
 app.use('/messages', Messages);
 
