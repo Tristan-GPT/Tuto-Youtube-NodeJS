@@ -12,7 +12,7 @@ async function getMessages() {
 		const messageDiv = document.createElement('div');
 		messageDiv.classList.add('message');
 
-		messageDiv.textContent = `${res.list[i].user} - ${res.list[i].content}`;
+		messageDiv.textContent = `${res.list[i].username} - ${res.list[i].content}`;
 
 		div.appendChild(messageDiv);
 	}

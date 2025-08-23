@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import bcrypt from 'bcrypt';
-import { db } from '../index.js';
+import { prisma } from '../index.js';
 import jwt from 'jsonwebtoken';
 import ms from 'ms';
 import { config } from 'dotenv';
@@ -46,13 +46,30 @@ router.post('/signup', async (req, res) => {
 
 	const hashPassword = await bcrypt.hash(password, 12);
 
-	const account = await db.promise().query('SELECT * FROM users WHERE mail = ?', [mail]);
-	if (account[0].length !== 0) {return res.status(401).json({ error: 'already exists.' });}
+	const account = await prisma.user.findUnique({
+		where: {
+			mail,
+		},
+	});
+
+	const verifyUsername = await prisma.user.findUnique({
+		where: {
+			username,
+		},
+	});
+	if (account || verifyUsername) {return res.status(401).json({ error: 'already exists.' });}
+
 	else {
 
 		try {
 
-			db.promise().query('INSERT INTO users (mail,password,username) VALUES (?,?,?)', [mail, hashPassword, username]);
+			await prisma.user.create({
+				data: {
+					username,
+					password: hashPassword,
+					mail,
+				},
+			});
 
 			const token = sendToken(res, { mail, username });
 			return res.status(200).json({ message: 'success.', token });
@@ -73,14 +90,16 @@ router.post('/login', async (req, res) => {
 
 	if (!mail || !password) return res.status(400).json({ error: 'Missing fields' });
 
-	const result = await db.promise().query('SELECT * FROM users WHERE mail = ?', [mail]);
-	if (result[0].length === 0) {return res.status(401).json({ error: 'No account' });}
+	const user = await prisma.user.findUnique({
+		where: { mail },
+	});
+	if (!user) {return res.status(401).json({ error: 'No user.' });}
 	else {
-		const hashedPassword = result[0][0].password;
+		const hashedPassword = user.password;
 		const same = await bcrypt.compare(password, hashedPassword);
 
 		if (same) {
-			const token = sendToken(res, { mail: result[0][0].mail, username: result[0][0].username });
+			const token = sendToken(res, { mail: user.mail, username: user.username });
 			return res.status(200).json({ message: 'success.', token });
 		}
 		else {
@@ -106,8 +125,13 @@ router.delete('/delete', isConnected, async (req, res) => {
 
 	if (!req.cookies.token) return res.status(401).json({ error: 'Not connected' });
 
-
-	db.query('DELETE FROM users WHERE mail = ?', [result.mail]);
+	const mail = req.user.mail;
+	const user = await prisma.user.findUnique({
+		where: {
+			mail,
+		},
+	});
+	if (!user) return res.status(401).json({ error: 'Unknown user.' });
 	res.clearCookie('token', {
 		httpOnly: true,
 		secure: process.env.PROD === 'true',

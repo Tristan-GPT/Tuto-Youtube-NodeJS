@@ -9,28 +9,16 @@ import Auth from './routes/Auth.js';
 import Messages from './routes/Messages.js';
 import cookieParser from 'cookie-parser';
 import bodyParser from 'body-parser';
-import { createConnection } from 'mysql2';
 import helmet from 'helmet';
 import { ratelimit } from './middlewares/ratelimit.js';
 import { ErrorHandler } from './middlewares/ErrorHandler.js';
-
+import { PrismaClient } from '@prisma/client';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 config({ path: resolve(__dirname, '../.env') });
 
-const db = createConnection({
-	host: 'localhost',
-	user: 'root',
-	password: '',
-	database: 'expresstuto',
-});
-
-db.connect(function(err) {
-	if (err) throw err;
-
-	console.log('Database connected.');
-});
+const prisma = new PrismaClient();
 
 const app = express();
 
@@ -65,5 +53,5 @@ app.listen(PORT, () => {
 });
 
 export {
-	db,
+	prisma,
 };

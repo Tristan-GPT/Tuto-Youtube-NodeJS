@@ -1,15 +1,25 @@
 import { Router } from 'express';
-import { db } from '../index.js';
+import { prisma } from '../index.js';
 import { isConnected } from '../middlewares/isConnected.js';
 
 const router = Router();
 
 router.get('/list', isConnected, async (_req, res) => {
 
-	const [rows] = await db.promise().query('SELECT * FROM messages');
-	const list = rows.slice(-10);
-	res.status(200).json({ list: list });
+	try {
 
+		const list = await prisma.message.findMany({
+			orderBy: { id: 'desc' },
+			take: 10,
+		});
+		res.status(200).json({ list: list });
+
+
+	}
+	catch (err) {
+		console.error(err);
+		res.status(500).json({ error: 'Error during messages finding.' });
+	}
 
 });
 
@@ -17,13 +27,21 @@ router.post('/post', isConnected, async (req, res) => {
 	const { message } = req.body;
 
 	if (!message) return res.status(401).json({ error: 'Missing fields.' });
-	const response = await verifyUser.json();
-	const user = response.username;
-	const userTest = await db.promise().query('SELECT * FROM users WHERE username = ?', [user]);
+	const user = req.user.username;
+	const userTest = await prisma.user.findUnique({
+		where: {
+			mail: req.user.mail,
+			username: user,
+		},
+	});
+	if (!userTest) return res.status(401).json({ error: 'Unknown user.' });
 
-	if (userTest[0].length === 0) return res.status(401).json({ error: 'Unknown user.' });
-
-	db.promise().query('INSERT INTO messages (content, user) VALUES (?,?)', [message, user]);
+	await prisma.message.create({
+		data: {
+			content: message,
+			username: user,
+		},
+	});
 
 	res.status(200).json({ message: 'success' });
 
