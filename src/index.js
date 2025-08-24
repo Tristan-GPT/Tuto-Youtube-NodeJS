@@ -26,7 +26,7 @@ app.use(express.json());
 app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(cors({
-	origin: ['http://localhost:5500'],
+	origin: ['http://localhost:5500', 'https://cat.miralys.xyz'],
 	credentials: true,
 	methods: ['GET', 'POST', 'DELETE'],
 }));

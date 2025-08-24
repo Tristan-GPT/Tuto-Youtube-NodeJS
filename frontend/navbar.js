@@ -1,8 +1,9 @@
 /* eslint-disable no-unused-vars */
+const PROD = false;
 document.addEventListener('DOMContentLoaded', () => {
 
 	const loginLink = document.querySelector('.navbar ul li a.login');
-	fetch('http://localhost:5000/auth/verify', {
+	fetch(PROD ? 'https://api.cat.miralys.xyz/auth/verify' : 'http://localhost:5000/auth/verify', {
 		method: 'GET',
 		credentials: 'include',
 	}).then(res => res.json())
@@ -30,7 +31,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 async function getLogout() {
-	const result = await fetch('http://localhost:5000/auth/logout', { method: 'POST', credentials: 'include' });
+	const result = await fetch(PROD ? 'https://api.cat.miralys.xyz/auth/logout' : 'http://localhost:5000/auth/logout', { method: 'POST', credentials: 'include' });
 
 	if (!result.ok) {
 		console.log('Erreur sur la déconnexion');

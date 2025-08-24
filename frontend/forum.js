@@ -1,6 +1,8 @@
 /* eslint-disable no-unused-vars */
+const PROD = false;
+
 async function getMessages() {
-	const result = await fetch('http://localhost:5000/messages/list', {
+	const result = await fetch(PROD ? 'https://api.cat.miralys.xyz/messages/list' : 'http://localhost:5000/messages/list', {
 		credentials: 'include',
 		method: 'GET',
 	});
@@ -32,7 +34,7 @@ async function postMessage() {
 
 	const message = document.getElementsByClassName('message-container')[0].value;
 
-	const posting = await fetch('http://localhost:5000/messages/post', {
+	const posting = await fetch(PROD ? 'https://api.cat.miralys.xyz/messages/post' : 'http://localhost:5000/messages/post', {
 		method: 'POST',
 		credentials: 'include',
 		headers: {
@@ -49,7 +51,7 @@ async function postMessage() {
 }
 
 async function deleteMessage(id) {
-	await fetch('http://localhost:5000/messages/delete', {
+	await fetch(PROD ? 'https://api.cat.miralys.xyz/messages/delete' : 'http://localhost:5000/messages/delete', {
 		method: 'POST',
 		credentials: 'include',
 		headers: {

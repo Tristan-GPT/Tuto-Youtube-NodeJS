@@ -1,6 +1,8 @@
+const PROD = false;
+
 async function getImage() {
 
-	const result = await fetch('http://localhost:5000/cat/catimage', {
+	const result = await fetch(PROD ? 'https://api.cat.miralys.xyz/cat/catimage' : 'http://localhost:5000/cat/catimage', {
 		method: 'GET',
 		headers: {
 			'Content-Type': 'application/json',

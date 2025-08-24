@@ -1,9 +1,11 @@
 /* eslint-disable no-unused-vars */
+const PROD = false;
+
 async function getLogin() {
 	const mail = document.getElementsByClassName('mail')[0].value;
 	const password = document.getElementsByClassName('password')[0].value;
 
-	const result = await fetch('http://localhost:5000/auth/login', {
+	const result = await fetch(PROD ? 'https://api.cat.miralys.xyz/auth/login' : 'http://localhost:5000/auth/login', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',
@@ -31,7 +33,7 @@ async function getSignup() {
 	const username = document.getElementsByClassName('username')[0].value;
 	console.log(password);
 	console.log(mail);
-	const result = await fetch('http://localhost:5000/auth/signup', {
+	const result = await fetch(PROD ? 'https://api.cat.miralys.xyz/auth/signup' : 'http://localhost:5000/auth/signup', {
 		method: 'POST',
 		headers: {
 			'Content-Type': 'application/json',

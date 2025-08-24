@@ -1,8 +1,16 @@
+import { dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+config({ path: resolve(__dirname, '../../.env') });
+
 export async function isConnected(req, res, next) {
 	const token = req.cookies.token;
 	if (!token) return res.status(401).json({ error: 'Not connected.' });
 
-	const verifyUser = await fetch('http://localhost:5000/auth/verify', {
+	const verifyUser = await fetch(process.env.PROD === 'true' ? 'https://api.cat.miralys.xyz/auth/verify' : 'http://localhost:5000/auth/verify', {
 		method: 'GET',
 		credentials: 'include',
 		headers: {
