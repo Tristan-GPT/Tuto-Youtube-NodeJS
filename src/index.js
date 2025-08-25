@@ -13,6 +13,10 @@ import helmet from 'helmet';
 import { ratelimit } from './middlewares/ratelimit.js';
 import { ErrorHandler } from './middlewares/ErrorHandler.js';
 import { PrismaClient } from '@prisma/client';
+import morgan from 'morgan';
+import logger from './utils/logger.js';
+import statusMonitor from 'express-status-monitor';
+
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -30,9 +34,23 @@ app.use(cors({
 	credentials: true,
 	methods: ['GET', 'POST', 'DELETE'],
 }));
-app.use(helmet());
+app.use(helmet({
+	contentSecurityPolicy: {
+		directives: {
+			'script-src': ['\'self\'', 'https://cdnjs.cloudflare.com', 'https://cdn.jsdelivr.net', 'https://cdn.socket.io', '\'sha256-smeKlzoBksVYJbpIwiP/yNzhQLzmXzVRkIh1Wvvydz4=\''],
+		},
+	},
+}));
 app.use(ratelimit());
 app.use((err, req, res, next) => ErrorHandler(err, req, res, next));
+
+app.use(morgan('combined', {
+	stream: {
+		write: (message) => logger.http(message.trim()),
+	},
+}));
+app.use(statusMonitor());
+
 app.use('/cat', Cat);
 app.use('/test', Test);
 app.use('/auth', Auth);
